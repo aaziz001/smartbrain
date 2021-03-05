@@ -23,11 +23,18 @@ const ParticlesParams = {
 }
 
 const initialState = {
-  id: '',
-  name: '',
-  email: '',
-  entries: 0,
-  joined: ''
+  input: '',
+  imageURL: '',
+  outputs: [],
+  route: 'signin',
+  isSignedin: false,
+  user: {  
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
 }
 
 class App extends Component{
@@ -39,7 +46,13 @@ class App extends Component{
       outputs: [],
       route: 'signin',
       isSignedin: false,
-      user: initialState
+      user: {  
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: ''
+      }
     }
   }
 
@@ -118,10 +131,7 @@ class App extends Component{
         isSignedin: true
       })
     } else if(route === 'signin'){
-      this.setState({
-        isSignedin: false,
-        user: initialState
-      })
+      this.setState(initialState)
     }
     this.setState({
       route: route
