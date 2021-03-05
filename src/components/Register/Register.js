@@ -29,7 +29,7 @@ class Register extends Component{
   }
 
   onSubmitSignIn = () =>{
-    fetch('https://git.heroku.com/serene-hollows-98478.git/register', {
+    fetch('https://serene-hollows-98478.herokuapp.com/register', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'

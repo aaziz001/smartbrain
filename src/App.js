@@ -69,7 +69,7 @@ class App extends Component{
     this.setState({
       imageURL: this.state.input
     })
-    fetch('https://git.heroku.com/serene-hollows-98478.git/imageURL', {
+    fetch('https://serene-hollows-98478.herokuapp.com/imageURL', {
       method: 'post',
       headers:{
         'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ class App extends Component{
     }).then(res => res.json())
       .then((res) => {
         if(res){
-          fetch('https://git.heroku.com/serene-hollows-98478.git/image', {
+          fetch('https://serene-hollows-98478.herokuapp.com/image', {
             method: 'put',
             headers: {
               'Content-Type': 'application/json'

@@ -22,7 +22,7 @@ class Signin extends Component{
   }
 
   onSubmitSignIn = () =>{
-    fetch('https://git.heroku.com/serene-hollows-98478.git/signin', {
+    fetch('https://serene-hollows-98478.herokuapp.com/signin', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
