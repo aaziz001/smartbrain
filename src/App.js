@@ -6,7 +6,6 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 import Signin from './components/Signin/Signin'
 import Register from './components/Register/Register'
 import Particles from 'react-particles-js'
-import Clarifai from 'clarifai'
 import './App.css';
 import 'tachyons'
 import { Component } from 'react'
@@ -23,9 +22,13 @@ const ParticlesParams = {
   }
 }
 
-const app = new Clarifai.App({
-  apiKey: 'ea60c88d6c204e198a177598a2dd9f10'
- });
+const initialState = {
+  id: '',
+  name: '',
+  email: '',
+  entries: 0,
+  joined: ''
+}
 
 class App extends Component{
   constructor(){
@@ -35,7 +38,8 @@ class App extends Component{
       imageURL: '',
       outputs: [],
       route: 'signin',
-      isSignedin: false
+      isSignedin: false,
+      user: initialState
     }
   }
 
@@ -60,12 +64,42 @@ class App extends Component{
     })
   }
 
+
   onSubmit = () => {
     this.setState({
       imageURL: this.state.input
     })
-    app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      .then((res) => res.outputs[0].data.regions)
+    fetch('https://git.heroku.com/serene-hollows-98478.git/imageURL', {
+      method: 'post',
+      headers:{
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        imageURL: this.state.input
+      })
+    }).then(res => res.json())
+      .then((res) => {
+        if(res){
+          fetch('https://git.heroku.com/serene-hollows-98478.git/image', {
+            method: 'put',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          }).then(res => res.json())
+          .then(entries => {
+            this.setState({
+              user: {
+                ...this.state.user,
+                entries
+              }
+            })
+          })
+        }
+        return res.outputs[0].data.regions
+      })
       .then((data) => data.map(region => region.region_info.bounding_box))
       .then((data) => {
         const locations = this.calculateFaceLocations(data);
@@ -85,11 +119,24 @@ class App extends Component{
       })
     } else if(route === 'signin'){
       this.setState({
-        isSignedin: false
+        isSignedin: false,
+        user: initialState
       })
     }
     this.setState({
       route: route
+    })
+  }
+
+  loaduser = user => {
+    this.setState({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        joined: user.joined,
+        entries: user.entries
+      }
     })
   }
 
@@ -101,12 +148,12 @@ class App extends Component{
         {this.state.route === 'home' ?  
         <div>
             <Logo />
-            <Rank />
+            <Rank name = {this.state.user.name} entries = {this.state.user.entries}/>
             <ImageLinkForm onInputChange = {this.onInputChange} onSubmit = {this.onSubmit}/>
             <FaceRecognition imageURL = {this.state.imageURL} coords = {this.state.outputs}/>
         </div>
-        :( this.state.route === 'signin' ? <Signin onRouteChange = {this.onRouteChange}/>
-          : <Register onRouteChange = {this.onRouteChange}/>
+        :( this.state.route === 'signin' ? <Signin onRouteChange = {this.onRouteChange} loaduser = {this.loaduser}/>
+          : <Register onRouteChange = {this.onRouteChange} loaduser = {this.loaduser}/>
         ) 
         }
 
